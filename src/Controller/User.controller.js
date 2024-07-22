@@ -29,46 +29,17 @@ exports.getuser = async (req, res) => {
   try {
     const { email, password, rememberme } = req.body;
     const user = await UserModel.findOne({ email: email });
-    if (user.password === password) {
-      const filter = { email: email };
-      const update = { rememberme: rememberme };
+    const passwordMatch = await verifyPassword(password, user.password);
 
-      //   const doc = await UserModel.findOneAndUpdate(filter, update, {
-      //     new: true,
-      //   });
-      user.rememberme = rememberme;
-      user.save();
-      //   if (doc) {
-      return res.status(200).json({ msg: "ID found & fetched", user: user });
-      //   }
+    if (!passwordMatch) {
+      return res.status(401).json({ msg: "Incorrect password" });
     }
-    return res
-      .status(404)
-      .json({ msg: "Email or password not found in Records", user: user });
+
+    user.rememberme = rememberme;
+    user.save();
+    return res.status(200).json({ msg: "Login successful", user });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ msg: "Server Error" });
   }
 };
-// exports.getformdata = async (req, res) => {
-//   try {
-//     const allforms = await UserModel.find({});
-//     if (allforms) {
-//       return res.status(200).json({ msg: "forms fetched", forms: allforms });
-//     }
-//     return res.status(404).json({ msg: "forms not found" });
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(500).json({ msg: "Server Error" });
-//   }
-// };
-
-// exports.updateformdata = async (req, res) => {
-//   try {
-//     const update = await UserModel.findByIdAndUpdate(req.params.id, req.body);
-//     return res.status(200).json({ msg: "forms fetched", forms: update });
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(500).json({ msg: "Server Error" });
-//   }
-// };

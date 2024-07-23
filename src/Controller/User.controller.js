@@ -34,7 +34,7 @@ exports.getuser = async (req, res) => {
     if (!passwordMatch) {
       return res.status(401).json({ msg: "Incorrect password" });
     }
-
+    user.password = null;
     user.rememberme = rememberme;
     user.save();
     return res.status(200).json({ msg: "Login successful", user });
